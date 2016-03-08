@@ -6,7 +6,7 @@ from flickrapi import FlickrAPI
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
-import requests, json
+import requests, json, random
 from StringIO import StringIO
 
 APP_KEY = "xxxxxx"
@@ -45,11 +45,11 @@ def get_photo():
 	Get third photo from Flickr interesting list
 	"""
 	# hit Flickr endpoint
-	f = flickr.interestingness.getList(extras='url_z', per_page='5')
+	f = flickr.interestingness.getList(extras='url_z', per_page='100')
 	data = json.loads(f.decode('utf-8'))
 
 	# parse out photo URL from JSON
-	url = data['photos']['photo'][2]['url_z']
+	url = data['photos']['photo'][random.randrange(100)]['url_z']
 	return url
 
 def get_name():
@@ -109,13 +109,23 @@ def create_image(name, title):
 	while font.getsize(title)[0] < img.size[0] * 0.78:
 		fontsize += 1
 		font = ImageFont.truetype('DejaVuSans-ExtraLight.ttf', fontsize)
-	
+
 	# set name font
 	bigfont = 1
    	font_bold = ImageFont.truetype("DejaVuSans-BoldOblique.ttf", bigfont)
    	while font_bold.getsize(name)[0] < img.size[0] * 0.9:
    		bigfont += 1
    		font_bold = ImageFont.truetype("DejaVuSans-BoldOblique.ttf", bigfont)
+
+	#draw outline
+	draw.text((img.size[0] * 0.05 -1, img.size[1] * 0.05), name, (0,0,0), font=font_bold)
+	draw.text((img.size[0] * 0.05 +1, img.size[1] * 0.05), name, (0,0,0), font=font_bold)
+	draw.text((img.size[0] * 0.05, img.size[1] * 0.05 -1), name, (0,0,0), font=font_bold)
+	draw.text((img.size[0] * 0.05, img.size[1] * 0.05 +1), name, (0,0,0), font=font_bold)
+	draw.text((img.size[0] * 0.15 -1, img.size[1] * 0.85), title, (0,0,0), font=font)
+	draw.text((img.size[0] * 0.15 +1, img.size[1] * 0.85), title, (0,0,0), font=font)
+	draw.text((img.size[0] * 0.15, img.size[1] * 0.85 -1), title, (0,0,0), font=font)
+	draw.text((img.size[0] * 0.15, img.size[1] * 0.85 +1), title, (0,0,0), font=font)
 
     # draw text to object
 	draw.text((img.size[0] * 0.05, img.size[1] * 0.05), name, (255,255,255), font=font_bold)
